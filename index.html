@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Каталог машин</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light dark;--paper:#F2F4F7;--surface:#FFFFFF;--soft:#EAEDF2;--ink:#15171C;--mute:#636A78;--line:#DCE0E7;
+ --lapis:#2443A6;--lapis-soft:#E4E9F8;--deal:#0E7A5C;--deal-soft:#E0F2EB;--alert:#B3361F;--alert-soft:#F8E6E2;--amber:#995C00;--amber-soft:#F7EDDC;
+ --r-lg:16px;--r-md:10px;--r-sm:6px}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--paper:#0F1216;--surface:#171B21;--soft:#1F242C;--ink:#E8EBF0;--mute:#9AA2B0;--line:#29303A;
+ --lapis:#8EA4FF;--lapis-soft:#1F2742;--deal:#4CC393;--deal-soft:#15302A;--alert:#FF8B76;--alert-soft:#3A1E1A;--amber:#F0B55E;--amber-soft:#35290F}}
+:root[data-theme=dark]{color-scheme:dark;--paper:#0F1216;--surface:#171B21;--soft:#1F242C;--ink:#E8EBF0;--mute:#9AA2B0;--line:#29303A;
+ --lapis:#8EA4FF;--lapis-soft:#1F2742;--deal:#4CC393;--deal-soft:#15302A;--alert:#FF8B76;--alert-soft:#3A1E1A;--amber:#F0B55E;--amber-soft:#35290F}
+:root[data-theme=light]{color-scheme:light}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font:15px/1.5 Manrope,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--paper);color:var(--ink);font-variant-numeric:tabular-nums}
+a{color:var(--lapis);text-decoration:none}a:hover{text-decoration:underline}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--lapis);outline-offset:2px}
+.wrap{max-width:1320px;margin:0 auto;padding:0 24px}
+
+/* шапка */
+.top{padding:22px 0 12px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.top h1{margin:0;font-size:26px;font-weight:800;letter-spacing:-.02em}
+.top .upd{color:var(--mute);font-size:13px}
+.warnline{background:var(--amber-soft);color:var(--amber);border-radius:var(--r-md);padding:8px 12px;font-size:13px;margin-bottom:10px}
+.nav{position:sticky;top:0;z-index:10;background:var(--paper);padding:8px 0 10px;border-bottom:1px solid var(--line)}
+.nav .wrap{overflow-x:auto;scrollbar-width:none}.nav .wrap::-webkit-scrollbar{display:none}
+.simlist{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden}
+.simrow{display:flex;justify-content:space-between;gap:10px;padding:8px 12px;border-top:1px solid var(--line);color:var(--ink);font-size:14px}
+.simrow:first-child{border-top:0}.simrow:hover{background:var(--soft);text-decoration:none}
+.mitem{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:12px 14px;margin:10px 0}
+.mitem .th{width:84px;aspect-ratio:3/2;flex:none;border-radius:var(--r-sm);background:var(--soft) center/cover no-repeat}
+.mitem .mt{color:var(--ink);font-weight:700}.mitem .ms{color:var(--mute);font-size:14px}
+.plats{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.plat{border:1px solid var(--line);border-radius:99px;padding:4px 11px;font-size:14px;font-weight:600;color:var(--ink);white-space:nowrap}
+.plat.lo{background:var(--deal-soft);border-color:var(--deal);color:var(--deal)}
+.seg{display:inline-flex;background:var(--soft);border-radius:12px;padding:3px;gap:2px}
+.seg button{border:0;background:transparent;padding:7px 16px;border-radius:9px;cursor:pointer;font-weight:600;color:var(--mute)}
+.seg button[aria-selected=true]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px #0000001a}
+.seg button .c{font-weight:500;color:var(--mute);margin-left:4px}
+
+/* фильтры */
+.quick{display:flex;gap:6px;overflow-x:auto;padding:14px 0 4px;scrollbar-width:none}
+.quick::-webkit-scrollbar{display:none}
+.qc{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:6px 13px;cursor:pointer;font-size:14px;font-weight:600;white-space:nowrap}
+.qc span{color:var(--mute);font-weight:500;margin-left:5px}
+.qc[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.qc[aria-pressed=true] span{color:inherit;opacity:.7}
+.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:8px 0 4px}
+.controls select,.more select,.more input[type=number]{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:var(--r-md);padding:7px 10px;font-size:14px;height:36px}
+.more input::placeholder{color:var(--mute);opacity:.8}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:var(--r-md);padding:7px 13px;cursor:pointer;font-size:14px;font-weight:600}
+.btn.pri{background:var(--lapis);border-color:var(--lapis);color:#fff}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--mute)}
+.more{display:none;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px 18px;margin:6px 0 2px;font-size:14px}
+.more.open{display:block}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px 18px}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field>span{font-size:13px;color:var(--mute);font-weight:600}
+.field select{width:100%}
+.range{display:flex;align-items:center;gap:6px}.range input{width:100%;min-width:0}.range i{color:var(--mute);font-style:normal}
+.checks{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.checks label{display:flex;align-items:center;gap:7px;cursor:pointer}
+.checks input{width:16px;height:16px;accent-color:var(--lapis)}
+.mfoot{display:flex;justify-content:flex-end;margin-top:10px}
+.more input[type=number]{-moz-appearance:textfield;appearance:textfield}
+.more input[type=number]::-webkit-inner-spin-button,.more input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.count{color:var(--mute);font-size:13px;padding:8px 0 2px}
+
+/* карточки */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(272px,1fr));gap:18px;padding:10px 0 100px}
+.car{background:var(--surface);border-radius:var(--r-lg);overflow:hidden;cursor:pointer;display:flex;flex-direction:column;border:1px solid var(--line)}
+.car:hover{border-color:color-mix(in srgb,var(--lapis) 45%,var(--line))}
+.photo{aspect-ratio:3/2;background:var(--soft) center/cover no-repeat;position:relative}
+.photo.none{display:grid;place-items:center;color:var(--mute);font-size:13px}
+.score{position:absolute;left:10px;top:10px;min-width:38px;height:28px;padding:0 9px;border-radius:99px;display:grid;place-items:center;font-weight:800;font-size:14px;background:var(--surface);color:var(--ink)}
+.score.hi{background:var(--deal);color:#fff}.score.lo{background:var(--alert);color:#fff}
+.pcount{position:absolute;right:10px;bottom:10px;background:#000a;color:#fff;font-size:12px;padding:2px 8px;border-radius:99px}
+.cmpb{position:absolute;right:10px;top:10px;border:0;border-radius:99px;background:#000a;color:#fff;font-size:12px;font-weight:600;padding:4px 10px;cursor:pointer}
+.cmpb[aria-pressed=true]{background:var(--lapis)}
+.info{padding:13px 15px 15px;display:flex;flex-direction:column;gap:6px;flex:1}
+.info h3{margin:0;font-size:16px;font-weight:700;line-height:1.3}
+.specs{margin:0;color:var(--mute);font-size:14px}
+.pr{display:flex;align-items:baseline;gap:8px;margin-top:2px}
+.pr b{font-size:23px;font-weight:800;letter-spacing:-.01em}
+.dl{font-size:14px;font-weight:700}
+.good{color:var(--deal)}.bad{color:var(--alert)}.warn{color:var(--amber)}.muted{color:var(--mute)}
+.meter{position:relative;height:6px;border-radius:99px;background:linear-gradient(90deg,var(--deal-soft),var(--soft) 50%,var(--alert-soft));margin:4px 0 0}
+.meter i{position:absolute;top:-4px;width:14px;height:14px;border-radius:50%;transform:translateX(-50%);border:2px solid var(--surface)}
+.meter::after{content:"";position:absolute;left:50%;top:-3px;width:2px;height:12px;background:var(--mute);opacity:.5}
+.mcap{font-size:12px;color:var(--mute)}
+.flags{display:flex;gap:5px;flex-wrap:wrap}
+.flag{font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--soft);color:var(--mute)}
+.flag.a{background:var(--alert-soft);color:var(--alert)}.flag.w{background:var(--amber-soft);color:var(--amber)}.flag.g{background:var(--deal-soft);color:var(--deal)}.flag.b{background:var(--lapis-soft);color:var(--lapis)}
+.money{margin:auto 0 0;padding-top:8px;border-top:1px solid var(--line);font-size:13px;color:var(--mute)}
+.money b{font-weight:700}
+.empty{padding:48px 0;color:var(--mute);max-width:560px}
+
+/* сравнение */
+.cmpbar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ink);color:var(--surface);border-radius:14px;padding:9px 10px 9px 16px;display:none;gap:10px;align-items:center;z-index:20;box-shadow:0 8px 24px #0004}
+.cmpbar .btn{border:0}
+
+/* окно машины */
+.modal{position:fixed;inset:0;background:#0009;display:none;z-index:30;overflow:auto;padding:28px 16px}
+.modal.open{display:block}
+.sheet{background:var(--surface);max-width:1000px;margin:0 auto;border-radius:20px;overflow:hidden;animation:pop .18s ease-out}
+@keyframes pop{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.sheet{animation:none}}
+.shead{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;padding:18px 22px 0}
+.shead h2{margin:0;font-size:21px;font-weight:800;letter-spacing:-.01em}
+.shead .pr b{font-size:27px}
+.x{border:0;background:var(--soft);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:16px;flex:none}
+.stabs{display:flex;gap:4px;padding:14px 22px 0;border-bottom:1px solid var(--line);overflow-x:auto}
+.stabs button{border:0;background:none;padding:9px 12px;cursor:pointer;font-weight:600;color:var(--mute);border-bottom:2px solid transparent;white-space:nowrap}
+.stabs button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--lapis)}
+.spane{padding:20px 22px 24px}
+.two{display:grid;grid-template-columns:1.15fr 1fr;gap:26px}
+.gal .main{width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:12px;background:var(--soft);display:block}
+.thumbs{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.thumbs img{width:66px;height:46px;object-fit:cover;border-radius:6px;cursor:pointer;opacity:.6}
+.thumbs img.on,.thumbs img:hover{opacity:1}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:7px 16px;margin:0;font-size:14px}
+.facts dt{color:var(--mute)}.facts dd{margin:0;font-weight:600}
+h4{margin:22px 0 8px;font-size:15px;font-weight:700}
+h4:first-child{margin-top:0}
+.note{background:var(--soft);border-radius:var(--r-md);padding:10px 13px;font-size:14px}
+.note.w{background:var(--amber-soft);color:var(--amber)}.note.g{background:var(--deal-soft);color:var(--ink)}.note.g b{color:var(--deal)}.note.a{background:var(--alert-soft);color:var(--alert)}
+.why{list-style:none;padding:0;margin:0;font-size:14px}.why li{display:flex;gap:10px;padding:5px 0;border-bottom:1px solid var(--line)}
+.why li b{min-width:34px;text-align:right}
+.desc{white-space:pre-wrap;font-size:14px;color:var(--mute);background:var(--soft);padding:12px 14px;border-radius:var(--r-md);max-height:320px;overflow:auto}
+ol.check{padding-left:20px;margin:0}ol.check li{margin:6px 0}
+.mrow{display:flex;gap:6px;flex-wrap:wrap;padding:12px 22px 0}
+.ihead{margin:22px 0 8px;font-size:16px}.ihead .muted{font-weight:400;font-size:14px}
+.itbl{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;background:var(--surface)}
+.irow{display:grid;grid-template-columns:2fr 1.3fr 1.3fr .8fr;gap:10px;padding:10px 14px;border-top:1px solid var(--line);color:var(--ink);font-size:14px;align-items:center}
+.irow:first-child{border-top:0}.irow:hover{background:var(--soft);text-decoration:none}.irow small{display:block;color:var(--mute);font-size:12.5px}
+.irow.best{background:var(--deal-soft)}.irate{font-weight:700;text-align:right}.iname{min-width:0}
+@media (max-width:640px){.irow{grid-template-columns:1fr 1fr}.irate{text-align:left}}
+.iq{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--line);font-size:14px}
+.iqb{display:flex;gap:6px;flex:none}.iqb button{width:40px;height:34px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);cursor:pointer;font-size:16px;font-weight:700}
+.iqb button[aria-pressed=true]{background:var(--deal-soft);border-color:var(--deal);color:var(--deal)}
+.iqb button.bad[aria-pressed=true]{background:var(--alert-soft);border-color:var(--alert);color:var(--alert)}
+.srch{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:6px 0;border-top:1px solid var(--line);font-size:14px}
+.srch:first-child{border-top:0}.srch .btn{padding:4px 10px;font-size:13px}
+.mb{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:5px 12px;cursor:pointer;font-size:14px;font-weight:600}
+.note-in{display:block;width:calc(100% - 44px);margin:10px 22px 0;min-height:44px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface);color:var(--ink);padding:8px 10px;font:inherit;font-size:14px;resize:vertical}
+.mb[aria-pressed=true]{background:var(--lapis-soft);border-color:var(--lapis);color:var(--lapis)}
+.sendbar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--lapis);color:#fff;border-radius:14px;padding:9px 10px 9px 16px;display:none;gap:10px;align-items:center;z-index:25;box-shadow:0 8px 24px #0004;max-width:calc(100% - 24px)}
+.sendbar .btn{border:0}
+.sfoot{display:flex;gap:8px;flex-wrap:wrap;padding:14px 22px;border-top:1px solid var(--line);background:var(--surface);position:sticky;bottom:0}
+svg text{fill:var(--mute);font-size:10px;font-family:inherit}
+
+/* деньги */
+.fsum{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.ledger{width:100%;border-collapse:collapse;font-size:14px}
+.ledger td{padding:6px 0;border-bottom:1px solid var(--line)}
+.ledger td:last-child{text-align:right;font-weight:600;white-space:nowrap}
+.ledger tr.tot td{font-weight:800;border-bottom:0;padding-top:9px;font-size:15px}
+.ledger tr.sub td{color:var(--mute)}
+.stack{display:flex;height:14px;border-radius:99px;overflow:hidden;background:var(--soft);margin:10px 0 6px}
+.stack i{display:block;height:100%}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--mute)}
+.legend span::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;background:var(--c)}
+.big{font-size:22px;font-weight:800;margin:2px 0}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{text-align:right;font-weight:600;color:var(--mute);padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap;font-size:13px}
+.tbl td{text-align:right;padding:8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl th:first-child,.tbl td:first-child{text-align:left}
+.tbl tr.pick td{background:var(--lapis-soft)}
+.tbl tbody tr.sel{cursor:pointer}.tbl tbody tr.sel:hover td{background:var(--soft)}
+.tbl tr.pick:hover td{background:var(--lapis-soft)}
+.scroll{overflow:auto}
+.sched{max-height:420px;overflow:auto;border:1px solid var(--line);border-radius:var(--r-md)}
+.sched .tbl th{position:sticky;top:0;background:var(--surface)}
+.sched tr.end td{font-weight:800}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.cond{display:none;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px 16px;background:var(--soft);border-radius:var(--r-md);padding:12px 14px;margin:0 0 6px;font-size:13px}
+.cond.open{display:grid}
+.cond label{display:flex;flex-direction:column;gap:4px;color:var(--mute)}
+.cond input{border:1px solid var(--line);background:var(--surface);border-radius:var(--r-sm);padding:6px 8px;font-size:14px;color:var(--ink)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.row input[type=number]{width:110px;border:1px solid var(--line);background:var(--surface);border-radius:var(--r-sm);padding:6px 8px}
+.fine{font-size:12px;color:var(--mute);margin-top:16px;line-height:1.55}
+
+/* рынок */
+.mk{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:18px;padding:16px 0 60px}
+.mpanel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px 20px}
+.mpanel h3{margin:0;font-size:18px;font-weight:800;display:flex;gap:8px;align-items:center}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0 6px}
+.stats div{background:var(--soft);border-radius:var(--r-md);padding:9px 11px}
+.stats b{display:block;font-size:19px;font-weight:800}.stats span{font-size:12px;color:var(--mute)}
+details{margin-top:10px}summary{cursor:pointer;font-weight:600;font-size:14px;color:var(--lapis)}
+.mini{width:100%;border-collapse:collapse;font-size:14px;margin-top:6px}.mini td{padding:5px 4px;border-bottom:1px solid var(--line)}
+.mini td:nth-child(2){text-align:right;font-weight:600}
+.deal{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);font-size:14px}
+
+@media (max-width:760px){
+ .wrap{padding:0 14px}.top h1{font-size:22px}
+ .grid{grid-template-columns:1fr 1fr;gap:10px}.info{padding:10px 11px 12px}.info h3{font-size:14px}.pr b{font-size:19px}.specs{font-size:13px}
+ .modal{padding:0}.sheet{border-radius:0;min-height:100%}.two,.fsum{grid-template-columns:1fr}.shead,.stabs,.spane,.sfoot,.mrow{padding-left:14px;padding-right:14px}
+ .mk{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+ .grid{grid-template-columns:1fr;gap:10px}.car{flex-direction:row}.photo{width:38%;flex:none;aspect-ratio:auto;min-height:168px}
+ .score{left:6px;top:6px;height:24px;min-width:32px;font-size:13px}.cmpb{top:auto;bottom:6px;right:auto;left:6px;font-size:11px;padding:3px 8px}.pcount{display:none}
+ .info{gap:4px}.mcap{display:none}.money{padding-top:6px;font-size:12px}
+ .fgrid{grid-template-columns:1fr 1fr;gap:12px}.more{padding:14px}.checks{gap:10px 16px}
+ .controls select{flex:1 1 46%;min-width:0}.controls .btn{flex:1 1 46%}.top{padding-top:16px}
+}
+</style><meta name="robots" content="noindex,nofollow">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head><body>
+<div class="wrap">
+ <div class="top"><h1>Подбор машины</h1><div class="upd" id="upd"></div></div>
+ <div id="warn"></div>
+</div>
+<div class="nav"><div class="wrap"><div class="seg" role="tablist" id="views">
+ <button role="tab" data-v="pick" aria-selected="true">Подборка<span class="c" id="c-pick"></span></button>
+ <button role="tab" data-v="market" aria-selected="false">Рынок</button>
+ <button role="tab" data-v="fav" aria-selected="false">Отмеченные<span class="c" id="c-fav"></span></button>
+ <button role="tab" data-v="multi" aria-selected="false">На разных площадках<span class="c" id="c-multi"></span></button>
+ <button role="tab" data-v="inst" aria-selected="false" id="t-inst" hidden>Рассрочки<span class="c" id="c-inst"></span></button>
+</div></div></div>
+
+<main class="wrap">
+ <section id="v-pick">
+  <div class="quick" id="quick"></div>
+  <div class="controls">
+   <select id="f-scope" aria-label="Какие машины показывать">
+    <option value="">Подходят и почти</option><option value="match">Только подходят</option><option value="all">Все модели, включая рынок</option><option value="market">Только рынок</option>
+   </select>
+   <select id="f-model" aria-label="Модель"><option value="">Все модели</option></select>
+   <select id="f-sort" aria-label="Сортировка">
+    <option value="score">Сначала выгодные</option><option value="delta">Дешевле справедливой</option><option value="price">Сначала дешёвые</option><option value="new">Сначала новые</option><option value="km">Меньше пробег</option>
+   </select>
+   <button class="btn" id="morebtn" aria-expanded="false">Фильтры</button>
+  </div>
+  <div class="more" id="more">
+   <div class="fgrid">
+    <div class="field"><span>Год выпуска</span><div class="range"><input id="f-y1" type="number" placeholder="от" inputmode="numeric"><i>–</i><input id="f-y2" type="number" placeholder="до" inputmode="numeric"></div></div>
+    <div class="field"><span>Цена, $</span><div class="range"><input id="f-p1" type="number" step="100" placeholder="от" inputmode="numeric"><i>–</i><input id="f-price" type="number" step="100" placeholder="до" inputmode="numeric"></div></div>
+    <div class="field"><span>Пробег, тыс. км</span><div class="range"><input id="f-k1" type="number" step="10" placeholder="от" inputmode="numeric"><i>–</i><input id="f-k2" type="number" step="10" placeholder="до" inputmode="numeric"></div></div>
+    <label class="field"><span>Коробка</span><select id="f-gb"><option value="">Любая</option><option value="MT">Механика</option><option value="AT">Автомат</option></select></label>
+    <label class="field"><span>Хозяев</span><select id="f-own"><option value="">Сколько угодно</option><option value="1">Один</option><option value="2">Не больше двух</option><option value="3">Не больше трёх</option></select></label>
+    <label class="field"><span>Где продают</span><select id="f-src"><option value="">Везде</option></select></label>
+    <label class="field"><span>Условия продажи</span><select id="f-terms"><option value="">Любые</option><option value="noinst">Без аренды и рассрочки</option><option value="clean">Без пометок</option><option value="only">Только с пометками</option></select></label>
+    <label class="field"><span>В продаже</span><select id="f-days"><option value="">Сколько угодно</option><option value="1">Со вчерашнего дня</option><option value="3">До 3 дней</option><option value="7">До недели</option><option value="30">До месяца</option></select></label>
+   </div>
+   <div class="checks">
+    <label><input type="checkbox" id="f-gas"> Без газа</label>
+    <label><input type="checkbox" id="f-res" checked> Без перекупов</label>
+    <label><input type="checkbox" id="f-native"> Родная краска</label>
+    <label><input type="checkbox" id="f-noacc"> Не было ДТП</label>
+    <label><input type="checkbox" id="f-photo"> Только с фото</label>
+    <label><input type="checkbox" id="f-tel"> Есть телефон</label>
+   </div>
+   <div class="mfoot"><button class="btn ghost" id="reset">Сбросить фильтры</button><button class="btn" id="ssave" hidden>🔔 Сохранить поиск</button></div>
+   <div id="ssaved" hidden style="margin-top:12px"></div>
+  </div>
+  <div class="count" id="count"></div>
+  <div class="grid" id="grid"></div>
+ </section>
+ <section id="v-market" hidden><div class="mk" id="mk"></div></section>
+ <section id="v-fav" hidden><div class="grid" id="grid-fav"></div></section>
+ <section id="v-inst" hidden><div id="inst" style="padding:6px 0 100px"></div></section>
+ <section id="v-multi" hidden><div id="multi" style="padding:6px 0 100px"></div></section>
+</main>
+
+<div class="cmpbar" id="cmpbar"><span id="cmpn"></span><button class="btn pri" id="cmpgo">Сравнить</button><button class="btn" id="cmpclr">Очистить</button></div>
+<div class="modal" id="modal" role="dialog" aria-modal="true"><div class="sheet" id="sheet"></div></div>
+
+<script type="text/plain" id="app">
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=v=>v?'$'+Number(v).toLocaleString('ru-RU'):'—';
+const num=v=>Number(v).toLocaleString('ru-RU');
+const mln=(v,d=2)=>Number(v).toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});
+const km=v=>v?(v>=1000?Math.round(v/1000)+' тыс. км':num(v)+' км'):'пробег не указан';
+const plural=(n,a,b,c)=>{const m=n%10,h=n%100;return n+' '+(m===1&&h!==11?a:m>=2&&m<=4&&(h<10||h>=20)?b:c)};
+const MARKS={fav:'В избранном',called:'Звонил',seen:'Смотрел',no:'Отказ'};
+// каталог в боте (мини-апп): отметки ставятся прямо здесь и уходят боту — см. catalog.py
+const CAT=window.CAT||null, MARK_BTNS={fav:'⭐ Избранное',called:'📞 Звонил',seen:'👀 Смотрел',no:'❌ Отказ',hide:'🙈 Скрыть'};
+/* «новое с прошлого раза»: сравниваем с тем, что было в предыдущей версии отчёта, которую открывали на этом устройстве */
+try{const K='carmon_seen',st=JSON.parse(localStorage.getItem(K)||'{}');
+ if(st.updated!==UPDATED){st.prev=st.cur||null;st.cur=Object.fromEntries(DATA.map(r=>[r.key,r.price_usd||0]));st.updated=UPDATED;localStorage.setItem(K,JSON.stringify(st))}
+ if(st.prev)DATA.forEach(r=>{const was=st.prev[r.key];if(was===undefined)r.new_me=true;else if(was&&r.price_usd&&r.price_usd<was)r.cheaper_me=was-r.price_usd})}catch(e){}
+const pick=DATA.filter(r=>r.status!=='Рынок'), mkt=DATA.filter(r=>r.status==='Рынок');
+const cmp=new Set(); let quick='';
+
+/* ───────── шапка ───────── */
+$('upd').textContent='Обновлено '+UPDATED+(STATS.usd_rate?', курс '+num(Math.round(STATS.usd_rate))+' сум':'');
+{const m=/^(\d\d)\.(\d\d)\.(\d{4}) (\d\d):(\d\d)/.exec(UPDATED);   // давно не запускали сбор — сказать прямо
+ if(m){const age=Math.floor((Date.now()-new Date(+m[3],m[2]-1,+m[1],+m[4],+m[5]))/864e5);
+  if(age>=2)$('warn').insertAdjacentHTML('afterbegin',`<div class="warnline">Данные от ${esc(UPDATED.slice(0,10))}, это ${plural(age,'день','дня','дней')} назад. Запустите сбор (run_monitor.bat), чтобы увидеть свежие объявления и цены.</div>`)}}
+const bad=Object.entries(STATS.sources||{}).filter(([k,v])=>!String(v).startsWith('ok'));
+if(bad.length)$('warn').innerHTML=`<div class="warnline">Не удалось обновить: ${bad.map(([k,v])=>esc(k)+' ('+esc(v)+')').join(', ')}. Показаны данные с прошлых запусков.</div>`;
+(STATS.warnings||[]).forEach(w=>$('warn').insertAdjacentHTML('beforeend',`<div class="warnline">${esc(w)}</div>`));
+[...new Set(DATA.map(r=>r.model_title))].sort().forEach(m=>$('f-model').insertAdjacentHTML('beforeend',`<option>${esc(m)}</option>`));
+const multiRows=()=>DATA.map((r,i)=>[r,i]).filter(([r])=>(r.platforms||[]).length>1&&!(r.marks||[]).some(m=>m==='no'||m==='hide'));
+$('c-multi').textContent=multiRows().length||'';
+const instRows=()=>DATA.map((r,i)=>[r,i]).filter(([r])=>r.inst&&r.inst.months&&!(r.marks||[]).some(m=>m==='no'||m==='hide'));
+{const n=instRows().length;$('c-inst').textContent=n||'';$('t-inst').hidden=!n}
+$('c-pick').textContent=pick.length;const favN=DATA.filter(r=>(r.marks||[]).length).length;$('c-fav').textContent=favN||'';
+
+/* ───────── карточка ───────── */
+function specs(r){return [r.year,km(r.km),r.gearbox,r.gas?'газ':'',r.owners?plural(+r.owners,'хозяин','хозяина','хозяев'):''].filter(Boolean).join(', ')}
+/* ───────── осмотр: чек-лист на авторынке ───────── */
+const INSP=[['Кузов',[['k1','Зазоры между деталями ровные, оттенок одинаковый'],['k2','Толщиномер: родная краска (до ~150 мкм)'],['k3','Нет ржавчины: пороги, арки, низ дверей'],['k4','Стёкла и фары родные (одна маркировка)'],['k5','Лонжероны, стойки и багажник без следов ремонта']]],
+ ['Двигатель',[['d1','Холодный запуск без стуков, дыма и троения'],['d2','Нет течей масла и антифриза'],['d3','Масло без эмульсии (крышка, щуп)'],['d4','Ровные обороты на холостых'],['d5','Check Engine не горит, ошибок нет']]],
+ ['Коробка и ходовая',[['h1','Переключения без рывков и пинков'],['h2','Сцепление не буксует (механика)'],['h3','Руль без люфта, машину не уводит'],['h4','Подвеска не стучит на кочках'],['h5','Тормоза без вибрации и скрипа']]],
+ ['Салон и электрика',[['s1','Кондиционер холодит'],['s2','Печка греет'],['s3','Износ руля, педалей и сиденья сходится с пробегом'],['s4','Стеклоподъёмники, фары и приборы работают']]],
+ ['Документы',[['t1','Техпаспорт на продавца или нотариальная доверенность'],['t2','Номер кузова совпадает с техпаспортом'],['t3','Нет залога и запрета на регистрацию'],['t4','Газ (если стоит) вписан в техпаспорт']]]];
+const INSP_T=Object.fromEntries(INSP.flatMap(([,it])=>it));
+function inspLocal(){try{return JSON.parse(localStorage.getItem('carmon_insp')||'{}')}catch(e){return {}}}
+function inspGet(r){return r.insp||inspLocal()[r.key]||null}
+function inspSave(r,d){const empty=!d||(!Object.keys(d.v||{}).length&&!(d.n||'').trim());r.insp=empty?null:d;
+ try{const a=inspLocal();if(empty)delete a[r.key];else a[r.key]=d;localStorage.setItem('carmon_insp',JSON.stringify(a))}catch(e){}
+ if(CAT&&CAT.insp)CAT.insp(r,empty?null:d)}
+function inspSum(r){const d=inspGet(r);if(!d)return null;const e=Object.entries(d.v||{});
+ return {ok:e.filter(([,x])=>x===1).length,bad:e.filter(([,x])=>x===2).map(([k])=>INSP_T[k]).filter(Boolean),n:d.n||''}}
+function inspNote(r){const s=inspSum(r);if(!s)return '';
+ return `<div class="note ${s.bad.length?'a':'g'}" style="margin-bottom:12px"><b>Осмотр:</b> в порядке ${s.ok}, проблем ${s.bad.length}${s.bad.length?'<div style="margin-top:4px">'+s.bad.map(x=>'✗ '+esc(x)).join('<br>')+'</div>':''}${s.n?`<div style="margin-top:4px">${esc(s.n)}</div>`:''} <a href="#" onclick="showTab('insp');return false">Открыть</a></div>`}
+function inspPane(r){const d=inspGet(r)||{v:{},n:''};
+ return `<p class="fine" style="margin:0 0 8px">Отмечайте прямо на осмотре: ✓ — в порядке, ✗ — проблема; нажмите ещё раз, чтобы снять. ${CAT?'Сохраняется в облаке Telegram и видно на всех ваших устройствах.':'Сохраняется в этом браузере.'} Осмотренные машины попадают во вкладку «Отмеченные».</p>`
+  +INSP.map(([g,items])=>`<h4 style="margin:16px 0 4px">${g}</h4>`+items.map(([id,t])=>`<div class="iq"><span>${t}</span><span class="iqb"><button data-iq="${id}" data-iv="1" aria-pressed="${d.v[id]===1}" aria-label="В порядке">✓</button><button class="bad" data-iq="${id}" data-iv="2" aria-pressed="${d.v[id]===2}" aria-label="Проблема">✗</button></span></div>`).join('')).join('')
+  +`<textarea class="note-in" id="inote" style="width:100%;margin:14px 0 0" placeholder="Что ещё заметили: стук справа спереди, торг до…" aria-label="Заметки осмотра">${esc(d.n||'')}</textarea>`}
+function bindInsp(r){const cur=()=>{const d=inspGet(r);return {v:{...((d&&d.v)||{})},n:(d&&d.n)||''}};
+ $('pane').querySelectorAll('[data-iq]').forEach(b=>b.onclick=()=>{const d=cur(),id=b.dataset.iq,v=+b.dataset.iv;
+  if(d.v[id]===v)delete d.v[id];else d.v[id]=v;inspSave(r,d);
+  $('pane').querySelectorAll(`[data-iq="${id}"]`).forEach(x=>x.setAttribute('aria-pressed',d.v[id]===+x.dataset.iv))});
+ const n=$('inote');let t;const save=()=>{const d=cur();d.n=n.value.trim().slice(0,600);inspSave(r,d)};
+ n.oninput=()=>{clearTimeout(t);t=setTimeout(save,600)};n.onblur=()=>{clearTimeout(t);save()}}
+function flags(r){const f=[];
+ if(r.new_me)f.push(['b','Новое для вас']);if(r.cheaper_me)f.push(['g','−$'+num(r.cheaper_me)+' с прошлого раза']);
+ if(r.reseller)f.push(['a','Перекуп']);if(r.photo_dupe)f.push(['a','Фото у другого номера']);if(r.ripe)f.push(['w','Готов торговаться']);if(r.dropped)f.push(['g','Цена снижена']);
+ if(r.is_new)f.push(['b','Новое']);if(r.low_km)f.push(['w','Проверить пробег']);if(r.status==='Почти подходит')f.push(['','Почти подходит']);if((r.terms||[]).some(t=>INST.includes(t)))f.push(['a','Цена не полная']);
+ if(r.status==='Рынок')f.push(['','Рынок']);(r.marks||[]).forEach(m=>MARKS[m]&&f.push(['',MARKS[m]]));if(r.note)f.push(['','📝 '+(r.note.length>24?r.note.slice(0,24)+'…':r.note)]);
+ const is=inspSum(r);if(is)f.push([is.bad.length?'a':'g','Осмотр: ✓'+is.ok+(is.bad.length?' ✗'+is.bad.length:'')]);return f}
+function flagsHtml(r,max){const f=flags(r);const s=f.slice(0,max||9).map(([c,t])=>`<span class="flag ${c}">${t}</span>`).join('');return s+(max&&f.length>max?`<span class="flag">+${f.length-max}</span>`:'')}
+function deltaTxt(r){if(r.delta==null)return '';const c=r.delta<=-3?'good':r.delta>=5?'bad':'muted';return `<span class="dl ${c}">${r.delta>0?'+':'−'}${Math.abs(r.delta)}%</span>`}
+function meter(r){if(r.delta==null)return '';const p=Math.max(3,Math.min(97,50+r.delta*2.5));const col=r.delta<=-3?'var(--deal)':r.delta>=5?'var(--alert)':'var(--mute)';
+ return `<div class="meter" title="Цена относительно справедливой"><i style="left:${p}%;background:${col}"></i></div><div class="mcap">Справедливая цена ${money(r.market)}</div>`}
+function moneyLine(r){if(r.left===''||r.left==null)return '';const l=+r.left;
+ return `<p class="money">${l>=0?`Займа хватит, останется <b class="good">${mln(l,1)} млн</b>`:`На машину не хватит <b class="bad">${mln(-l,1)} млн</b>`}</p>`}
+function scoreCls(s){return s>=65?'hi':s<40?'lo':''}
+function cardHtml(r,i){
+ const ph=r.photo?`class="photo" style="background-image:url('${esc(r.photo)}')"`:'class="photo none"';
+ return `<article class="car" tabindex="0" data-i="${i}" aria-label="${esc(r.title)} ${esc(r.year||'')}">
+ <div ${ph}>${r.photo?'':'Нет фото'}<span class="score ${scoreCls(r.score)}" title="Оценка выгодности из 100">${r.score}</span>
+  <button class="cmpb" aria-pressed="${cmp.has(i)}" data-cmp="${i}">${cmp.has(i)?'В сравнении':'Сравнить'}</button>
+  ${(r.photos||[]).length>1?`<span class="pcount">${r.photos.length} фото</span>`:''}</div>
+ <div class="info"><h3>${esc(r.title)}</h3><p class="specs">${esc(specs(r))}</p>
+  <div class="pr"><b>${money(r.price_usd)}</b>${deltaTxt(r)}</div>${meter(r)}
+  <div class="flags">${flagsHtml(r,2)}</div>${moneyLine(r)}</div></article>`}
+function bindCards(root){root.querySelectorAll('.car').forEach(el=>{el.onclick=e=>{const b=e.target.closest('[data-cmp]');if(b){e.stopPropagation();toggleCmp(+b.dataset.cmp);return}openCard(+el.dataset.i)};
+ el.onkeydown=e=>{if(e.key==='Enter'){openCard(+el.dataset.i)}}})}
+
+/* ───────── подборка ───────── */
+const INST=['Аренда','Рассрочка','Рассрочка?'];
+const QUICK=[['','Все',r=>true],['mine','Новое для вас',r=>r.new_me||r.cheaper_me],['match','Подходят',r=>r.status==='Подходит'],['new','Новые',r=>r.is_new],['drop','Снизили цену',r=>r.dropped],['ripe','Готовы торговаться',r=>r.ripe],['fit','Хватает займа',r=>r.fits]];
+function base(){const fs=$('f-scope').value,fm=$('f-model').value;
+ let src=fs==='all'?DATA:fs==='market'?mkt:(fm&&!pick.some(r=>r.model_title===fm)?mkt:pick);
+ let rows=src.map(r=>[r,DATA.indexOf(r)]);
+ if(fm)rows=rows.filter(([r])=>r.model_title===fm);if(fs==='match')rows=rows.filter(([r])=>r.status==='Подходит');
+ const v=id=>$(id).value,n=id=>$(id).value===''?null:+$(id).value,c=id=>$(id).checked,F=[];
+ const y1=n('f-y1'),y2=n('f-y2'),p1=n('f-p1'),p2=n('f-price'),k1=n('f-k1'),k2=n('f-k2'),own=n('f-own'),days=n('f-days');
+ if(y1!=null)F.push(r=>r.year&&r.year>=y1);if(y2!=null)F.push(r=>r.year&&r.year<=y2);
+ if(p1!=null)F.push(r=>r.price_usd&&r.price_usd>=p1);if(p2!=null)F.push(r=>r.price_usd&&r.price_usd<=p2);
+ if(k1!=null)F.push(r=>r.km&&r.km>=k1*1000);if(k2!=null)F.push(r=>r.km&&r.km<=k2*1000);
+ if(v('f-gb'))F.push(r=>r.gearbox_code===v('f-gb'));if(own!=null)F.push(r=>r.owners&&+r.owners<=own);
+ if(v('f-src')==='__dealer')F.push(r=>r.dealer);
+ else if(v('f-src')==='__nodealer')F.push(r=>!r.dealer);
+ else if(v('f-src'))F.push(r=>r.source===v('f-src')||(r.others_links||[]).some(o=>o.name===v('f-src')));
+ if(days!=null)F.push(r=>r.days!=null&&r.days<=days);
+ const ft=v('f-terms'),tm=r=>r.terms||[];
+ if(ft==='noinst')F.push(r=>!tm(r).some(t=>INST.includes(t)));if(ft==='clean')F.push(r=>!tm(r).length);if(ft==='only')F.push(r=>tm(r).length>0);
+ if(c('f-gas'))F.push(r=>!r.gas);if(c('f-res'))F.push(r=>!r.reseller);
+ if(c('f-native'))F.push(r=>r.paint_state==='native');if(c('f-noacc'))F.push(r=>!r.accident);
+ if(c('f-photo'))F.push(r=>r.photo);if(c('f-tel'))F.push(r=>r.contact_tel);
+ rows=rows.filter(([r])=>F.every(f=>f(r)));
+ return rows.filter(([r])=>!(r.marks||[]).some(m=>m==='no'||m==='hide'))}
+function render(){const b=base();
+ $('quick').innerHTML=QUICK.filter(([k,t,f])=>!k||quick===k||b.some(([r])=>f(r))).map(([k,t,f])=>`<button class="qc" aria-pressed="${quick===k}" data-q="${k}">${t}<span>${b.filter(([r])=>f(r)).length}</span></button>`).join('');
+ $('quick').querySelectorAll('.qc').forEach(el=>el.onclick=()=>{quick=el.dataset.q;render()});
+ let rows=b.filter(([r])=>QUICK.find(q=>q[0]===quick)[2](r));
+ const s=$('f-sort').value;
+ rows.sort(([a],[c])=>s==='price'?(a.price_usd||1e9)-(c.price_usd||1e9):s==='km'?(a.km||1e9)-(c.km||1e9):s==='new'?String(c.first_seen).localeCompare(String(a.first_seen)):s==='delta'?((a.delta??99)-(c.delta??99)):(c.score-a.score));
+ const nf=FILTERS.filter(id=>id!=='f-res'&&($(id).type==='checkbox'?$(id).checked:$(id).value!=='')).length+($('f-res').checked?0:1);
+ saveFilters();
+ $('morebtn').textContent=nf?`Фильтры (${nf})`:'Фильтры';
+ $('count').textContent=rows.length?'Показано: '+plural(rows.length,'машина','машины','машин'):'';
+ $('grid').innerHTML=rows.length?rows.map(([r,i])=>cardHtml(r,i)).join(''):'<div class="empty">Под эти условия машин нет. Снимите часть фильтров или выберите «Все модели, включая рынок».</div>';
+ bindCards($('grid'))}
+function markRow(r){if(!CAT||!r.rid)return '';const ms=r.marks||[];
+ return `<div class="mrow">${Object.entries(MARK_BTNS).map(([m,t])=>`<button class="mb" aria-pressed="${ms.includes(m)}" data-mark="${m}">${t}</button>`).join('')}</div>
+ <textarea class="note-in" id="note" placeholder="Заметка: звонил, торг до…, смотреть в субботу" aria-label="Заметка">${esc(r.note||'')}</textarea>`}
+function shareCar(i){const r=DATA[i];const text=`${r.title} ${r.year||''}, ${km(r.km)}, ${money(r.price_usd)}`+(r.market?` (справедливая ${money(r.market)})`:'');
+ const u='https://t.me/share/url?url='+encodeURIComponent(r.url)+'&text='+encodeURIComponent(text);
+ if(CAT)return CAT.open(u);if(navigator.share)return navigator.share({title:r.title,text,url:r.url}).catch(()=>{});window.open(u,'_blank')}
+function bindMarks(r){const n=$('note');if(n){let t;n.oninput=()=>{clearTimeout(t);t=setTimeout(()=>{r.note=n.value.trim();CAT.note(r,r.note)},600)};
+  n.onblur=()=>{clearTimeout(t);if((r.note||'')!==n.value.trim()){r.note=n.value.trim();CAT.note(r,r.note);render()}}}
+ $('sheet').querySelectorAll('[data-mark]').forEach(b=>b.onclick=()=>{const m=b.dataset.mark,on=!(r.marks||[]).includes(m);
+ r.marks=on?[...(r.marks||[]),m]:(r.marks||[]).filter(x=>x!==m);b.setAttribute('aria-pressed',on);CAT.toggle(r,m,on);
+ $('c-fav').textContent=DATA.filter(x=>(x.marks||[]).length).length||'';render();if(!$('v-fav').hidden)renderFav()})}
+function renderFav(){const rows=DATA.map((r,i)=>[r,i]).filter(([r])=>(r.marks||[]).length||r.note||inspGet(r));
+ $('grid-fav').innerHTML=rows.length?rows.map(([r,i])=>cardHtml(r,i)).join(''):'<div class="empty">Здесь появятся машины, которые вы отметите: кнопками под уведомлениями в Telegram-боте'+(CAT?' или в карточке машины здесь':'')+': избранное, звонил, смотрел.</div>';bindCards($('grid-fav'))}
+$('morebtn').onclick=()=>{const o=$('more').classList.toggle('open');$('morebtn').setAttribute('aria-expanded',o)};
+const FILTERS=['f-y1','f-y2','f-p1','f-price','f-k1','f-k2','f-gb','f-own','f-src','f-terms','f-days','f-gas','f-res','f-native','f-noacc','f-photo','f-tel'];
+const KEEP=['f-scope','f-sort'].concat(FILTERS);
+[...new Set(DATA.flatMap(r=>[r.source].concat((r.others_links||[]).map(o=>o.name))).filter(Boolean))].sort().forEach(x=>$('f-src').insertAdjacentHTML('beforeend',`<option>${esc(x)}</option>`));
+if(DATA.some(r=>r.dealer))$('f-src').insertAdjacentHTML('beforeend','<option value="__dealer">Все каналы дилеров</option><option value="__nodealer">Кроме дилеров</option>');
+function saveFilters(){try{localStorage.setItem('carmon_filters',JSON.stringify(Object.fromEntries(KEEP.map(id=>[id,$(id).type==='checkbox'?$(id).checked:$(id).value]))))}catch(e){}}
+try{const st=JSON.parse(localStorage.getItem('carmon_filters')||'{}');KEEP.forEach(id=>{if(!(id in st))return;const el=$(id);if(el.type==='checkbox')el.checked=!!st[id];else if(el.tagName!=='SELECT'||[...el.options].some(o=>o.value===st[id]))el.value=st[id]})}catch(e){}
+$('reset').onclick=()=>{FILTERS.forEach(id=>{const el=$(id);if(el.type==='checkbox')el.checked=id==='f-res';else el.value=''});render()};
+['f-scope','f-model','f-sort'].concat(FILTERS).forEach(id=>$(id).addEventListener('input',render));
+
+/* ───────── сохранённые поиски: бот пришлёт новые машины под фильтр ───────── */
+const SFL={g:'f-gas',n:'f-native',a:'f-noacc',r:'f-res'};
+function searchCode(){const v=id=>$(id).value,fm=v('f-model'),num0=id=>v(id)===''?'':String(Math.max(0,Math.round(+v(id))));
+ const mk=fm?((DATA.find(r=>r.model_title===fm)||{}).model||''):'';
+ const fl=Object.entries(SFL).filter(([,id])=>$(id).checked).map(([k])=>k).join('')+(v('f-terms')==='noinst'?'i':v('f-terms')==='clean'?'c':'')+(v('f-src')==='__nodealer'?'d':'');
+ return [mk.replace(/_/g,'-'),num0('f-y1'),num0('f-y2'),num0('f-p1'),num0('f-price'),num0('f-k1'),num0('f-k2'),v('f-gb'),v('f-own'),fl].join('_')}
+function searchName(code){const p=code.split('_'),mt=(DATA.find(r=>r.model===p[0].replace(/-/g,'_'))||{}).model_title;
+ const rg=(a,b,f)=>a&&b?f(a)+'–'+f(b):a?'от '+f(a):b?'до '+f(b):'';
+ const fl={g:'без газа',n:'родная краска',a:'без ДТП',r:'без перекупов',i:'без рассрочки',c:'без пометок',d:'без дилеров'};
+ return [mt||(p[0]?p[0]:'все модели'),rg(p[1],p[2],x=>x)&&rg(p[1],p[2],x=>x)+' г.',rg(p[3],p[4],x=>money(+x)),rg(p[5],p[6],x=>x)&&rg(p[5],p[6],x=>x)+' тыс. км',
+  {AT:'автомат',MT:'механика'}[p[7]]||'',p[8]?'хозяев до '+p[8]:''].concat([...(p[9]||'')].map(c=>fl[c])).filter(Boolean).join(', ')}
+function applySearch(code){const p=code.split('_'),mt=(DATA.find(r=>r.model===p[0].replace(/-/g,'_'))||{}).model_title||'';
+ $('f-scope').value='all';$('f-model').value=mt;[['f-y1',1],['f-y2',2],['f-p1',3],['f-price',4],['f-k1',5],['f-k2',6],['f-gb',7],['f-own',8]].forEach(([id,j])=>$(id).value=p[j]||'');
+ Object.entries(SFL).forEach(([k,id])=>$(id).checked=(p[9]||'').includes(k));$('f-terms').value=(p[9]||'').includes('i')?'noinst':(p[9]||'').includes('c')?'clean':'';
+ $('f-src').value=(p[9]||'').includes('d')?'__nodealer':'';render()}
+let SAVED=[];
+function renderSaved(){const b=$('ssaved');b.hidden=!SAVED.length;
+ b.innerHTML=SAVED.length?`<div class="fine" style="margin-bottom:4px">Сохранённые поиски — бот пришлёт новые машины под них после запуска:</div>`+SAVED.map((c,j)=>`<div class="srch"><span>${esc(searchName(c))}</span><span style="display:flex;gap:6px;flex:none"><button class="btn ghost" data-sapply="${j}">Показать</button><button class="btn ghost" data-sdel="${j}">Удалить</button></span></div>`).join(''):'';
+ b.querySelectorAll('[data-sapply]').forEach(x=>x.onclick=()=>applySearch(SAVED[+x.dataset.sapply]));
+ b.querySelectorAll('[data-sdel]').forEach(x=>x.onclick=()=>{const c=SAVED[+x.dataset.sdel];if(!confirm('Удалить поиск «'+searchName(c)+'»? Бот перестанет присылать по нему машины.'))return;
+  SAVED=SAVED.filter(y=>y!==c);CAT.store.set('searches',SAVED);renderSaved();CAT.open('https://t.me/'+CAT.bot+'?start=sx_'+c)})}
+if(CAT&&CAT.bot&&CAT.store){$('ssave').hidden=false;
+ CAT.store.get('searches').then(v=>{SAVED=Array.isArray(v)?v:[];renderSaved()});
+ $('ssave').onclick=()=>{const c=searchCode(),p=c.split('_');
+  if(!p[0]&&!p.slice(1,9).some(Boolean)){alert('Сначала выберите модель или задайте год, цену или пробег.');return}
+  if(c.length>61){alert('Слишком длинный поиск — уберите часть условий.');return}
+  if(SAVED.includes(c)){alert('Такой поиск уже сохранён.');return}
+  if(!confirm('Сохранить поиск «'+searchName(c)+'»?\n\nОткроется чат с ботом — нажмите «Запустить» (Start). Учитываются модель, год, цена, пробег, коробка, хозяева и галочки; площадка (кроме «Кроме дилеров») и срок в продаже — нет.'))return;
+  SAVED.push(c);CAT.store.set('searches',SAVED);renderSaved();CAT.open('https://t.me/'+CAT.bot+'?start=sv_'+c)}}
+
+/* ───────── сравнение ───────── */
+function toggleCmp(i){if(cmp.has(i))cmp.delete(i);else{if(cmp.size>=3){alert('Сравнить можно до трёх машин');return}cmp.add(i)}
+ document.querySelectorAll(`[data-cmp="${i}"]`).forEach(b=>{b.setAttribute('aria-pressed',cmp.has(i));b.textContent=cmp.has(i)?'В сравнении':'Сравнить'});
+ $('cmpbar').style.display=cmp.size?'flex':'none';$('cmpn').textContent='Выбрано '+cmp.size+' из 3'}
+$('cmpclr').onclick=()=>{[...cmp].forEach(i=>toggleCmp(i))};
+$('cmpgo').onclick=()=>{const rs=[...cmp].map(i=>DATA[i]);if(rs.length<2){alert('Выберите хотя бы две машины');return}
+ const best=(f,lo)=>{const v=rs.map(f).filter(x=>x!=null&&x!=='');return v.length?(lo?Math.min(...v):Math.max(...v)):null};
+ const row=(n,f,fmt,lo)=>{const b=lo===undefined?null:best(f,lo);return `<tr><td>${n}</td>${rs.map(r=>{const v=f(r);return `<td class="${b!=null&&v===b?'good':''}" style="text-align:left">${fmt?fmt(v,r):esc(v??'—')}</td>`}).join('')}</tr>`};
+ $('sheet').innerHTML=`<div class="shead"><h2>Сравнение</h2><button class="x" onclick="closeM()" aria-label="Закрыть">✕</button></div><div class="spane scroll"><table class="tbl">
+ <tr><td></td>${rs.map(r=>`<td style="text-align:left;white-space:normal">${r.photo?`<img src="${esc(r.photo)}" style="width:100%;max-width:220px;aspect-ratio:3/2;object-fit:cover;border-radius:8px">`:''}<div style="font-weight:700">${esc(r.title)}</div></td>`).join('')}</tr>
+ ${row('Оценка',r=>r.score,v=>`<b>${v}</b> из 100`,false)}${row('Цена',r=>r.price_usd,v=>money(v),true)}${row('Торг',r=>r.bargain?r.bargain.offer:null,(v,r)=>v?`с ${money(v)}, до ${money(r.bargain.ceiling)}`:'—',true)}${row('К справедливой',r=>r.delta,v=>v==null?'—':(v>0?'+':'')+v+'%',true)}
+ ${row('Год',r=>r.year,null,false)}${row('Пробег',r=>r.km,v=>v?num(v)+' км':'—',true)}${row('Коробка',r=>r.gearbox)}${row('Газ',r=>r.gas||'нет')}${row('Хозяев',r=>r.owners||null,null,true)}
+ ${row('Краска и ДТП',r=>r.paint)}${row('Останется с займа',r=>r.left===''?null:+r.left,v=>v==null?'—':mln(v,1)+' млн',false)}
+ ${rs.some(r=>r.installment)?row('Рассрочка',r=>r.installment||null):''}${rs.some(r=>r.own_m)?row('Топливо в месяц',r=>r.own_m?(r.gas?r.own_m.methane:r.own_m.petrol):null,(v,r)=>v?mln(v/1e6,1)+' млн сум'+(r.gas?' (метан)':' (бензин)'):'—',true):''}${row('В продаже',r=>r.days,v=>plural(v,'день','дня','дней'))}${row('Продавец',r=>r.reseller?'Перекуп':(r.ripe_text||'—'))}${row('Контакт',r=>r.contact||r.contact_hint)}
+ ${row('Объявление',r=>r.url,(v,r)=>`<a href="${esc(v)}" target="_blank">${esc(r.source)}</a>`)}</table></div>`;openM()};
+
+/* ───────── финансы ───────── */
+const FD=Object.assign({microloan_amount_mln:100,microloan_rate:25,microloan_terms:[12,24,36,48,60],microloan_term:'auto',insurance_per_year_pct:1.25,insurance_refund_share:.8,registration_mln:6.35,extra_costs_mln:.7,current_payments_mln:4.61,monthly_comfort_mln:10,monthly_max_mln:15},STATS.fin||{});
+let FU={};try{FU=JSON.parse(localStorage.getItem('carmon_fin')||'{}')}catch(e){}
+const fin=()=>Object.assign({},FD,FU);
+const pmt=(rate,n,pv)=>{const r=rate/1200;return r?pv*r/(1-Math.pow(1+r,-n)):pv/n};
+const insOf=(f,n)=>f.microloan_amount_mln*f.insurance_per_year_pct/100*n/12;
+function autoTerm(f){const T=[...f.microloan_terms].sort((a,b)=>a-b);if(/^\d+$/.test(String(f.microloan_term)))return +f.microloan_term;
+ return T.find(n=>pmt(f.microloan_rate,n,f.microloan_amount_mln)+f.current_payments_mln<=f.monthly_comfort_mln)||T.find(n=>pmt(f.microloan_rate,n,f.microloan_amount_mln)+f.current_payments_mln<=f.monthly_max_mln)||T[T.length-1]}
+/* график: pay=null — по договору; иначе фиксированная сумма в месяц; pre — сколько внести сразу после выдачи */
+function schedule(f,n,pay,pre){const r=f.microloan_rate/1200;let bal=f.microloan_amount_mln-(pre||0);const mand=pmt(f.microloan_rate,n,bal);const p=Math.max(mand,pay||0);const rows=[];
+ for(let k=1;k<=n&&bal>1e-6;k++){const it=bal*r;const pp=Math.min(p,bal+it);const pr=pp-it;bal=Math.max(0,bal-pr);rows.push({k,pay:pp,int:it,prin:pr,bal})}return {rows,mand}}
+function irr(net,flows){let lo=0,hi=.2;for(let j=0;j<80;j++){const m=(lo+hi)/2;const pv=flows.reduce((s,c,k)=>s+c/Math.pow(1+m,k+1),0);if(pv>net)lo=m;else hi=m}return (Math.pow(1+(lo+hi)/2,12)-1)*100}
+function termRow(f,n){const ins=insOf(f,n),net=f.microloan_amount_mln-ins,pay=pmt(f.microloan_rate,n,f.microloan_amount_mln),tot=pay+f.current_payments_mln;const interest=pay*n-f.microloan_amount_mln;
+ return {n,ins,net,pay,tot,interest,over:interest+ins,eff:irr(net,Array(n).fill(pay)),lvl:tot<=f.monthly_comfort_mln?'good':tot<=f.monthly_max_mln?'warn':'bad'}}
+const refundAt=(f,n,k)=>k>=n?0:insOf(f,n)*(n-k)/n*f.insurance_refund_share;
+const monthName=k=>{const d=new Date();d.setDate(1);d.setMonth(d.getMonth()+k);return d.toLocaleDateString('ru-RU',{month:'short',year:'numeric'}).replace(' г.','')};
+let FS={};
+function finPane(r){const f=fin();if(FS.key!==r.key)FS={key:r.key,term:autoTerm(f),extra:null,pre:false,mode:'plan'};
+ const n=FS.term,T=f.microloan_terms.map(t=>termRow(f,t)),cur=T.find(t=>t.n===n)||termRow(f,n),auto=autoTerm(f);
+ const rate=STATS.usd_rate||12000,car=(r.price_usd||0)*rate/1e6,need=car+f.registration_mln+f.extra_costs_mln,left=cur.net-need;
+ const capacity=Math.max(0,f.monthly_max_mln-f.current_payments_mln);if(FS.extra==null)FS.extra=+Math.max(cur.pay,capacity).toFixed(2);
+ const pre=FS.pre&&left>0?left:0;
+ /* досрочно */
+ const early=schedule(f,n,FS.extra,pre),ek=early.rows.length,eInt=early.rows.reduce((s,x)=>s+x.int,0),eRef=refundAt(f,n,ek);
+ const plan=schedule(f,n,null,pre),pInt=plan.rows.reduce((s,x)=>s+x.int,0);
+ const strat=f.microloan_terms.map(t=>{const s=schedule(f,t,FS.extra,pre),k=s.rows.length,i=s.rows.reduce((a,x)=>a+x.int,0),ins=insOf(f,t),rf=refundAt(f,t,k);return {t,mand:s.mand,k,i,ins,rf,net:f.microloan_amount_mln-ins,cost:i+ins-rf}});
+ const bestS=strat.reduce((a,b)=>b.cost<a.cost?b:a);
+ const sc=FS.mode==='early'?early:plan;const W=f.microloan_amount_mln;
+ const segs=left>=0?[[car,'var(--lapis)'],[f.registration_mln+f.extra_costs_mln,'var(--amber)'],[cur.ins,'var(--alert)'],[left,'var(--deal)']]:[[car,'var(--lapis)'],[f.registration_mln+f.extra_costs_mln,'var(--amber)'],[cur.ins,'var(--alert)']];
+ const tot=Math.max(W,need+cur.ins);
+ return `
+ <div class="row" style="justify-content:space-between;margin-bottom:6px"><div class="muted" style="font-size:14px">Микрозайм ${mln(f.microloan_amount_mln,0)} млн под ${mln(f.microloan_rate,0)}%. Текущие кредиты ${mln(f.current_payments_mln)} млн в месяц, всего готовы платить ${mln(f.monthly_comfort_mln,0)}–${mln(f.monthly_max_mln,0)} млн в месяц.</div><button class="btn ghost" onclick="toggleCond()">Изменить условия</button></div>
+ <div class="cond${FS.cond?' open':''}" id="cond">
+  ${[['microloan_amount_mln','Сумма займа, млн'],['microloan_rate','Ставка, % годовых'],['insurance_per_year_pct','Страховка, % за год срока'],['insurance_refund_share','Доля возврата страховки (0–1)'],['current_payments_mln','Текущие платежи, млн в месяц'],['monthly_comfort_mln','Комфортно всего в месяц, млн'],['monthly_max_mln','Максимум всего в месяц, млн'],['registration_mln','Переоформление, млн'],['extra_costs_mln','ОСАГО, диагностика, дорога, млн']].map(([k,t])=>`<label>${t}<input type="number" step="any" value="${f[k]}" data-fin="${k}"></label>`).join('')}
+  <div class="row"><button class="btn" onclick="resetFin()">Вернуть из настроек</button></div>
+ </div>
+
+ <div class="fsum" style="margin-top:12px">
+  <div><h4>Хватит ли денег на машину</h4>
+   <div class="big ${left>=0?'good':'bad'}">${left>=0?'Останется '+mln(left,1)+' млн':'Не хватает '+mln(-left,1)+' млн'}</div>
+   <div class="stack">${segs.map(([v,c])=>`<i style="width:${v/tot*100}%;background:${c}"></i>`).join('')}</div>
+   <div class="legend"><span style="--c:var(--lapis)">машина</span><span style="--c:var(--amber)">оформление</span><span style="--c:var(--alert)">страховка</span>${left>=0?'<span style="--c:var(--deal)">остаток</span>':''}</div>
+   <p class="fine">Срок займа ${n} мес. Страховка зависит от срока, поэтому на другом сроке остаток будет другим.</p>
+  </div>
+  <table class="ledger">
+   <tr><td>Микрозайм</td><td>${mln(f.microloan_amount_mln)} млн</td></tr>
+   <tr class="sub"><td>Страховку удержат сразу (${mln(f.insurance_per_year_pct*n/12)}% на ${n} мес)</td><td>−${mln(cur.ins)} млн</td></tr>
+   <tr><td><b>Придёт на карту</b></td><td>${mln(cur.net)} млн</td></tr>
+   <tr><td>Машина: ${money(r.price_usd)} по ${num(Math.round(rate))} сум</td><td>${mln(car)} млн</td></tr>
+   <tr><td>Переоформление</td><td>${mln(f.registration_mln)} млн</td></tr>
+   <tr><td>ОСАГО, диагностика, дорога</td><td>${mln(f.extra_costs_mln)} млн</td></tr>
+   <tr><td><b>Нужно на покупку</b></td><td>${mln(need)} млн</td></tr>
+   <tr class="tot"><td>${left>=0?'Остаётся':'Не хватает'}</td><td class="${left>=0?'good':'bad'}">${mln(Math.abs(left))} млн</td></tr>
+  </table>
+ </div>
+
+ <h4>Срок займа</h4>
+ <p class="fine" style="margin:0 0 8px">Нажмите на строку, чтобы посмотреть её график. Цвет показывает, укладываются ли все платежи вместе с текущими в ${mln(f.monthly_comfort_mln,0)} млн (зелёный) или в ${mln(f.monthly_max_mln,0)} млн (жёлтый).</p>
+ <div class="scroll"><table class="tbl"><thead><tr><th>Срок</th><th>Страховка</th><th>На карту</th><th>Платёж</th><th>Всего в месяц</th><th>Проценты</th><th>Переплата</th><th>Реальная ставка</th></tr></thead><tbody>
+ ${T.map(t=>`<tr class="sel ${t.n===n?'pick':''}" data-term="${t.n}"><td><b>${t.n} мес</b>${t.n===auto?' <span class="flag g">оптимально</span>':''}</td><td>${mln(t.ins)}</td><td>${mln(t.net)}</td><td>${mln(t.pay)}</td><td><span class="dot" style="background:var(--${t.lvl==='good'?'deal':t.lvl==='warn'?'amber':'alert'})"></span>${mln(t.tot)}</td><td>${mln(t.interest)}</td><td><b>${mln(t.over)}</b></td><td>${mln(t.eff,1)}%</td></tr>`).join('')}
+ </tbody></table></div>
+ <p class="fine">Все суммы в млн сум. «Переплата» — проценты плюс страховка. «Реальная ставка» учитывает, что проценты идут на всю сумму, а на карту приходит меньше.</p>
+
+ <h4>Если гасить быстрее графика</h4>
+ <div class="row"><label class="row">Платить по займу <input type="number" step="0.1" min="0" id="extra" value="${FS.extra}"> млн в месяц</label>
+  <span class="muted" style="font-size:13px">Вместе с текущими: ${mln(Math.max(FS.extra,early.mand)+f.current_payments_mln)} млн</span></div>
+ ${left>0?`<label class="row" style="margin-top:8px;font-size:14px"><input type="checkbox" id="pre" ${FS.pre?'checked':''}> Сразу внести остаток ${mln(left,1)} млн в погашение</label>`:''}
+ <div class="note" style="margin-top:10px">На сроке ${n} мес займ закроется за <b>${plural(ek,'месяц','месяца','месяцев')}</b> вместо ${n}. Проценты ${mln(eInt)} млн вместо ${mln(pInt)} млн. После закрытия можно по заявлению через банк вернуть часть страховки: примерно <b>${mln(eRef)} млн</b> из ${mln(cur.ins)}. Итого переплата около <b>${mln(eInt+cur.ins-eRef)} млн</b> вместо ${mln(pInt+cur.ins)} млн.</div>
+ <div class="scroll" style="margin-top:12px"><table class="tbl"><thead><tr><th>Срок договора</th><th>Обязательный платёж</th><th>Закроете за</th><th>Проценты</th><th>Страховка</th><th>Вернут</th><th>Итого переплата</th></tr></thead><tbody>
+ ${strat.map(s=>`<tr class="${s.t===bestS.t?'pick':''}"><td><b>${s.t} мес</b>${s.t===bestS.t?' <span class="flag g">дешевле всего</span>':''}</td><td>${mln(s.mand)}</td><td>${s.k} мес</td><td>${mln(s.i)}</td><td>${mln(s.ins)}</td><td>${mln(s.rf)}</td><td><b>${mln(s.cost)}</b></td></tr>`).join('')}
+ </tbody></table></div>
+ <p class="fine">Длинный срок даёт маленький обязательный платёж — запас на тяжёлый месяц, но страховку удерживают больше, и на руки приходит меньше. Короткий срок дешевле, если вы уверены, что потянете обязательный платёж.</p>
+
+ <h4>График платежей на ${n} мес</h4>
+ <div class="seg" style="margin-bottom:10px"><button aria-selected="${FS.mode==='plan'}" data-mode="plan">По договору</button><button aria-selected="${FS.mode==='early'}" data-mode="early">С досрочным погашением</button></div>
+ <div class="sched"><table class="tbl"><thead><tr><th>№</th><th>Месяц</th><th>Платёж</th><th>Проценты</th><th>Основной долг</th><th>Остаток долга</th><th>Всего с текущими</th><th>Закрыть после него: вернут страховки</th></tr></thead><tbody>
+ ${pre?`<tr><td>0</td><td>${monthName(0)}</td><td>${mln(pre)}</td><td>0,00</td><td>${mln(pre)}</td><td>${mln(f.microloan_amount_mln-pre)}</td><td>—</td><td>досрочный взнос из остатка</td></tr>`:''}
+ ${sc.rows.map((x,j)=>`<tr class="${j===sc.rows.length-1?'end':''}"><td>${x.k}</td><td>${monthName(x.k)}</td><td>${mln(x.pay)}</td><td>${mln(x.int)}</td><td>${mln(x.prin)}</td><td>${mln(x.bal)}</td><td>${mln(x.pay+f.current_payments_mln)}</td><td>${x.bal>0?mln(refundAt(f,n,x.k)):mln(refundAt(f,n,x.k))+' (закрыт)'}</td></tr>`).join('')}
+ <tr class="end"><td></td><td>Итого</td><td>${mln(sc.rows.reduce((s,x)=>s+x.pay,0)+pre)}</td><td>${mln(sc.rows.reduce((s,x)=>s+x.int,0))}</td><td>${mln(f.microloan_amount_mln)}</td><td></td><td></td><td></td></tr>
+ </tbody></table></div>
+ <p class="fine">Расчёт аннуитетный, первый платёж через месяц после выдачи. Страховка: ${mln(f.insurance_per_year_pct)}% от суммы займа за каждый год срока — так было в вашем прошлом займе (3,75 млн со 100 млн на 36 мес). Возврат при досрочном закрытии пропорционален неиспользованному сроку полиса; здесь заложено ${Math.round(f.insurance_refund_share*100)}% от него, так как страховая может удержать свои расходы. Точные суммы будут в информационном листе в Milliy перед подписанием. Это расчёт, а не финансовая рекомендация.</p>`}
+function bindFin(r){const p=$('pane');
+ p.querySelectorAll('[data-term]').forEach(el=>el.onclick=()=>{FS.term=+el.dataset.term;FS.extra=null;showTab('money')});
+ p.querySelectorAll('[data-mode]').forEach(el=>el.onclick=()=>{FS.mode=el.dataset.mode;showTab('money')});
+ const ex=$('extra');if(ex)ex.onchange=()=>{FS.extra=+ex.value||0;FS.mode='early';showTab('money')};
+ const pr=$('pre');if(pr)pr.onchange=()=>{FS.pre=pr.checked;showTab('money')};
+ p.querySelectorAll('[data-fin]').forEach(el=>el.onchange=()=>{const v=parseFloat(el.value);if(!isNaN(v))FU[el.dataset.fin]=v;try{localStorage.setItem('carmon_fin',JSON.stringify(FU))}catch(e){}const k=FS.key;FS={key:k,term:autoTerm(fin()),extra:null,pre:FS.pre,mode:FS.mode,cond:true};showTab('money')})}
+function toggleCond(){FS.cond=!FS.cond;$('cond').classList.toggle('open',FS.cond)}
+function resetFin(){FU={};try{localStorage.removeItem('carmon_fin')}catch(e){}FS.key=null;showTab('money')}
+
+/* ───────── окно машины ───────── */
+let CUR=null;
+function spark(vals,w=300,h=70){if(!vals||vals.length<2)return '';const mn=Math.min(...vals),mx=Math.max(...vals),rg=mx-mn||1;
+ const pts=vals.map((v,i)=>[14+i*(w-28)/(vals.length-1),h-12-(v-mn)/rg*(h-30)]);
+ return `<svg width="100%" viewBox="0 0 ${w} ${h}" style="max-width:${w}px"><polyline fill="none" stroke="var(--lapis)" stroke-width="2" points="${pts.map(p=>p.join(',')).join(' ')}"/>${pts.map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="var(--lapis)"/><text x="${p[0]}" y="${p[1]-8}" text-anchor="middle">$${vals[i]}</text>`).join('')}</svg>`}
+function strip(r){const m=(STATS.market||{})[r.model];if(!m||!m.points||!r.price_usd)return '';const pts=m.points.filter(p=>Math.abs(p[0]-r.year)<=1);if(pts.length<4)return '';
+ const w=420,h=58,ps=pts.map(p=>p[1]).concat([r.price_usd]),mn=Math.min(...ps),mx=Math.max(...ps),sc=v=>12+(v-mn)/((mx-mn)||1)*(w-24);
+ return `<svg width="100%" viewBox="0 0 ${w} ${h}">${pts.map(p=>`<circle cx="${sc(p[1])}" cy="${16+((p[2]||0)%7)*3}" r="3.5" fill="var(--mute)" opacity=".4"/>`).join('')}<line x1="${sc(r.price_usd)}" x2="${sc(r.price_usd)}" y1="6" y2="44" stroke="var(--lapis)" stroke-width="2.5"/><text x="12" y="${h-2}">$${mn}</text><text x="${w-12}" y="${h-2}" text-anchor="end">$${mx}</text><text x="${sc(r.price_usd)}" y="${h-2}" text-anchor="middle" style="fill:var(--lapis);font-weight:700">эта машина</text></svg><p class="fine" style="margin-top:4px">Серые точки — ${plural(pts.length,'объявление','объявления','объявлений')} ${esc(r.model_title)} ${r.year-1}–${r.year+1} годов за 30 дней.</p>`}
+function contactBtns(r){return r.contact_tel?`<a class="btn pri" href="tel:${esc(r.contact_tel)}">Позвонить ${esc(r.contact)}</a><a class="btn" href="https://t.me/${esc(r.contact_tel)}" target="_blank">Написать в Telegram</a>`:''}
+const TABS=[['over','Обзор'],['money','Деньги'],['price','Цена'],['check','Проверка'],['insp','Осмотр']];
+function openCard(i){CUR=DATA[i];const r=CUR;
+ $('sheet').innerHTML=`<div class="shead"><div><h2>${esc(r.title)} ${esc(r.year||'')}</h2><div class="pr"><b>${money(r.price_usd)}</b>${deltaTxt(r)}${r.delta!=null?`<span class="muted" style="font-size:14px">к справедливой ${money(r.market)}</span>`:''}</div></div><button class="x" onclick="closeM()" aria-label="Закрыть">✕</button></div>
+ <div class="stabs" role="tablist">${TABS.map(([k,t])=>`<button role="tab" data-tab="${k}">${t}</button>`).join('')}</div>
+ ${markRow(r)}<div class="spane" id="pane"></div>
+ <div class="sfoot">${contactBtns(r)}<a class="btn" href="${esc(r.url)}" target="_blank">Открыть объявление (${esc(r.source)})</a><button class="btn" onclick="shareCar(${i})">Поделиться</button>${(r.others_links||[]).map(o=>`<a class="btn" href="${esc(o.url)}" target="_blank">${esc(o.name)}: ${money(o.price)}</a>`).join('')}</div>`;
+ $('sheet').querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));if(CAT)bindMarks(r);showTab('over');openM()}
+const KEYIDX=Object.fromEntries(DATA.map((r,i)=>[r.key,i]));
+function simHtml(r){const s=(r.similar||[]).map(k=>KEYIDX[k]).filter(i=>i!=null);if(!s.length)return '';
+ return `<h4 style="margin:18px 0 6px">Похожие машины</h4><div class="simlist">${s.map(i=>{const x=DATA[i],d=x.price_usd&&r.price_usd?x.price_usd-r.price_usd:null;
+  return `<a href="#" class="simrow" data-sim="${i}"><span>${esc(x.title)} ${esc(x.year||'')}, ${km(x.km)}</span><span><b>${money(x.price_usd)}</b>${d?` <span class="${d<0?'good':'bad'}">${d>0?'+':'−'}$${num(Math.abs(d))}</span>`:''}</span></a>`}).join('')}</div>
+  <p class="fine" style="margin:4px 0 0">Та же модель, год ±1, похожий пробег. Разница — относительно этой машины: аргумент в торге.</p>`}
+function showTab(t){const r=CUR;$('sheet').querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));let h='';
+ if(t==='over'){const ph=r.photos&&r.photos.length?r.photos:(r.photo?[r.photo]:[]);
+  const facts=[['Год',r.year],['Пробег',r.km?num(r.km)+' км':''],['Коробка',r.gearbox],['Газ',r.gas?'есть':'нет'],['Хозяев',r.owners],['Краска и ДТП',r.paint],['Где',r.region],['В продаже',r.days!=null?plural(r.days,'день','дня','дней'):''],['Площадка',r.source],['Контакт',r.contact||r.contact_hint]].filter(([,v])=>v!==''&&v!=null);
+  h=`<div class="two"><div class="gal">${ph.length?`<img class="main" id="gmain" src="${esc(ph[0])}" alt="">`:'<div class="desc">Фото нет</div>'}${ph.length>1?`<div class="thumbs">${ph.map((p,j)=>`<img src="${esc(p)}" class="${j?'':'on'}" alt="" data-ph>`).join('')}</div>`:''}</div>
+  <div>${flags(r).length?`<div class="flags" style="margin-bottom:14px">${flagsHtml(r)}</div>`:''}
+   ${inspNote(r)}
+   ${r.photo_dupe?`<div class="note a" style="margin-bottom:12px">Это фото встречается в объявлении с другого номера телефона: возможно, перекуп выложил чужую машину или чужие фото.</div>`:''}
+   ${r.reseller?`<div class="note a" style="margin-bottom:12px">На этом номере ${plural(+r.reseller,'машина','машины','машин')} за год — похоже на перекупа.</div>`:''}
+   ${r.ripe?`<div class="note w" style="margin-bottom:12px">Продавец готов торговаться: ${esc(r.ripe_text)}.</div>`:''}
+   ${r.installment?`<div class="note a" style="margin-bottom:12px"><b>Рассрочка продавца:</b> ${esc(r.installment)}.<div class="fine" style="margin-top:4px">Посчитано по условиям из текста объявления. Ставка — как у кредита с такими платежами на сумму «рыночная цена минус взнос».</div></div>`:''}
+   ${r.bargain?`<div class="note g" style="margin-bottom:12px"><b>Торг:</b> начните с <b>${money(r.bargain.offer)}</b>, выше <b>${money(r.bargain.ceiling)}</b> не платить.<div class="fine" style="margin-top:4px">${esc(r.bargain.why.join('; '))}.</div></div>`:''}
+   <dl class="facts">${facts.map(([k,v])=>`<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')}</dl>
+   ${r.own?`<div class="note" style="margin-top:12px"><b>Расходы в месяц</b> ${esc(r.own)}.<div class="fine" style="margin-top:4px">Прикидка по типичному расходу модели и ценам из настроек (раздел ownership в config.yaml).</div></div>`:''}
+   ${simHtml(r)}
+   ${r.left!==''&&r.left!=null?`<div class="note" style="margin-top:16px">${+r.left>=0?`Займа хватит, после покупки и оформления останется <b>${mln(+r.left,1)} млн</b>.`:`На машину с оформлением не хватит <b>${mln(-r.left,1)} млн</b>.`} <a href="#" onclick="showTab('money');return false">Посчитать займ</a></div>`:''}
+  </div></div>`}
+ if(t==='money')h=finPane(r);
+ if(t==='insp')h=inspPane(r);
+ if(t==='price'){const why=(r.why||[]).map(([x,p])=>`<li><b class="${p>0?'good':'bad'}">${p>0?'+':'−'}${Math.abs(p)}</b><span>${esc(x)}</span></li>`).join('');const m=(STATS.market||{})[r.model]||{};
+  h=`<div class="two"><div><h4>Оценка ${r.score} из 100</h4><p class="fine" style="margin:0 0 8px">Старт с 50 баллов, дальше плюсы и минусы:</p><ul class="why">${why||'<li>Ничего особенного</li>'}</ul></div>
+  <div>${r.delta!=null?`<h4>Цена относительно справедливой</h4>${meter(r)}<p class="fine">Справедливую цену программа считает по объявлениям этой модели за последние месяцы с учётом года, пробега, коробки, газа, краски и числа хозяев.</p>`:''}
+   <h4>Среди похожих</h4>${strip(r)||'<p class="muted">Похожих объявлений пока мало.</p>'}
+   ${r.history_list&&r.history_list.length>1?`<h4>Как менялась цена</h4>${spark(r.history_list)}`:''}
+   ${m.sold&&m.sold.n?`<h4>За сколько реально продают</h4><p style="margin:0">За 60 дней в канале продано ${plural(m.sold.n,'машина','машины','машин')} ${esc(r.model_title)}, медиана ${money(m.sold.median)}.</p>`:''}</div></div>`}
+ if(t==='check')h=`<div class="two"><div><h4>Что спросить у продавца</h4><ol class="check">${(r.checklist||[]).map(q=>`<li>${esc(q)}</li>`).join('')}</ol>${r.low_km?'<div class="note w" style="margin-top:14px">Пробег подозрительно маленький для этого года — стоит проверить по сервисной истории и износу салона.</div>':''}</div>
+  <div><h4>Описание из объявления</h4><div class="desc">${esc(r.description||'Описания нет')}</div></div></div>`;
+ $('pane').innerHTML=h;
+ $('pane').querySelectorAll('[data-sim]').forEach(a=>a.onclick=e=>{e.preventDefault();openCard(+a.dataset.sim)});
+ $('pane').querySelectorAll('[data-ph]').forEach(im=>im.onclick=()=>{$('gmain').src=im.src;$('pane').querySelectorAll('[data-ph]').forEach(x=>x.classList.toggle('on',x===im))});
+ if(t==='money')bindFin(r);if(t==='insp')bindInsp(r)}
+let lastFocus=null;
+function openM(){lastFocus=document.activeElement;$('modal').classList.add('open');document.body.style.overflow='hidden';$('modal').scrollTop=0;const x=$('sheet').querySelector('.x');x&&x.focus()}
+function closeM(){$('modal').classList.remove('open');document.body.style.overflow='';lastFocus&&lastFocus.focus&&lastFocus.focus()}
+$('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeM()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeM()});
+
+/* ───────── рынок ───────── */
+function lineChart(tr,w=420,h=130){if(!tr||tr.length<2)return '<p class="muted" style="font-size:14px">Для графика пока мало данных.</p>';const vals=tr.map(t=>t[1]);const mn=Math.min(...vals)*.97,mx=Math.max(...vals)*1.03;
+ const x=i=>40+i*(w-56)/(tr.length-1),y=v=>h-20-(v-mn)/(mx-mn||1)*(h-36),step=Math.ceil(tr.length/6);
+ return `<svg width="100%" viewBox="0 0 ${w} ${h}"><polyline fill="none" stroke="var(--lapis)" stroke-width="2" points="${tr.map((t,i)=>x(i)+','+y(t[1])).join(' ')}"/>${tr.map((t,i)=>`<circle cx="${x(i)}" cy="${y(t[1])}" r="3" fill="var(--lapis)"><title>${t[0]}: $${t[1]}, ${t[2]} объявл.</title></circle>`).join('')}
+ ${tr.map((t,i)=>i%step===0||i===tr.length-1?`<text x="${x(i)}" y="${h-4}" text-anchor="middle">${t[0].slice(5)}.${t[0].slice(2,4)}</text>`:'').join('')}<text x="2" y="${y(Math.max(...vals))+4}">$${Math.max(...vals)}</text><text x="2" y="${y(Math.min(...vals))+4}">$${Math.min(...vals)}</text></svg>`}
+function renderMarket(){const M=STATS.market||{};const keys=Object.keys(M).sort((a,b)=>(M[a].watch_only-M[b].watch_only)||(M[b].n_30d-M[a].n_30d));
+ $('mk').innerHTML=keys.map(k=>{const m=M[k];const all=DATA.filter(r=>r.model===k);const deals=all.filter(r=>r.delta!=null&&r.delta<=-10&&!r.reseller).sort((a,b)=>a.delta-b.delta).slice(0,3);
+  const tr=m.trend||[],last=tr.length?tr[tr.length-1][1]:null,prev=tr.length>3?tr[tr.length-4][1]:null,chg=last&&prev?Math.round((last-prev)/prev*100):null;
+  const f=(m.formula||[]).filter(([n,v])=>Math.abs(v)>=20).map(([n,v])=>`<tr><td>${esc(n)}</td><td class="${v<0?'bad':'good'}">${v>0?'+':'−'}$${Math.abs(v)}</td></tr>`).join('');const s=m.selling||{},sp=m.speed||{};
+  return `<div class="mpanel"><h3>${esc(m.title)} <span class="flag ${m.watch_only?'':'b'}">${m.watch_only?'Только рынок':'Ищем'}</span></h3>
+  <div class="stats"><div><b>${last?money(last):'—'}</b><span>медиана за месяц${chg!=null?`, <span class="${chg<0?'good':chg>0?'bad':''}">${chg>0?'+':''}${chg}% за 3 мес</span>`:''}</span></div>
+   <div><b>${m.n_30d}</b><span>объявлений за 30 дней</span></div><div><b>${m.sold&&m.sold.n?money(m.sold.median):'—'}</b><span>${m.sold&&m.sold.n?'реально продали, '+m.sold.n+' шт. за 60 дней':'данных о продажах нет'}</span></div></div>
+  ${lineChart(tr)}
+  ${deals.length?`<h4>Ниже справедливой на 10% и больше</h4>${deals.map(r=>`<div class="deal"><a href="#" data-open="${DATA.indexOf(r)}">${esc(r.title)} ${r.year}, ${km(r.km)}</a><span>${money(r.price_usd)} <b class="good">${r.delta}%</b></span></div>`).join('')}`:''}
+  ${(m.years&&m.years.length)||f||s.n||sp.n?`<details><summary>Цены по годам и что на них влияет</summary>
+   ${m.years&&m.years.length?`<h4>Медиана по годам выпуска</h4><table class="mini">${m.years.map(y=>`<tr><td>${y.year}</td><td>${money(y.median)}</td><td class="muted" style="text-align:right">${y.n} объявл.</td></tr>`).join('')}</table>`:''}
+   ${f?`<h4>Что влияет на цену</h4><table class="mini">${f}</table>`:''}
+   ${sp.n?`<h4>Как быстро продаются</h4><p style="font-size:14px;margin:0 0 6px">Из ${sp.n} проданных или снятых машин половина ушла за ${plural(sp.median_days,'день','дня','дней')} (четверть — за ${sp.q25}, три четверти — за ${sp.q75}); за неделю — ${sp.week_pct}%. Цену перед продажей снижали ${sp.dropped_pct}%, в среднем на ${sp.median_drop_pct}%.</p>
+    ${(sp.buckets||[]).length?`<table class="mini">${sp.buckets.map(b=>`<tr><td>${esc(b.name)}</td><td>${plural(b.median_days,'день','дня','дней')}</td><td class="muted" style="text-align:right">${b.n} машин</td></tr>`).join('')}</table><p class="muted" style="font-size:13px;margin:4px 0 0">Медиана дней в продаже в зависимости от первой цены. Дорогую машину можно не торопиться брать: продавец, скорее всего, уступит.</p>`:''}`:''}
+   ${s.n?`<h4>Как продают</h4><p style="font-size:14px;margin:0">Между первым и последним объявлением одной машины в среднем ${plural(s.median_days,'день','дня','дней')}. Цену снижали ${s.share_dropped}% продавцов, в среднем на ${s.median_drop_pct}% (по ${s.n} машинам).</p>`:''}</details>`:''}
+  <div style="margin-top:14px"><button class="btn" data-model="${esc(m.title)}">Показать все объявления (${all.length})</button></div></div>`}).join('')||'<div class="empty">Данных пока нет. Запустите мониторинг или выгрузку истории канала, и здесь появятся цены по моделям.</div>';
+ $('mk').querySelectorAll('[data-open]').forEach(a=>a.onclick=e=>{e.preventDefault();openCard(+a.dataset.open)});
+ $('mk').querySelectorAll('[data-model]').forEach(b=>b.onclick=()=>{$('f-model').value=b.dataset.model;$('f-scope').value='all';quick='';setView('pick');render();window.scrollTo(0,0)})}
+
+/* ───────── на разных площадках ───────── */
+function renderMulti(){const spread=r=>{const v=r.platforms.map(p=>p.price).filter(Boolean);return v.length>1?Math.max(...v)-Math.min(...v):0};
+ const rows=multiRows().sort(([a],[b])=>spread(b)-spread(a));
+ $('multi').innerHTML=rows.length?`<p class="muted" style="font-size:14px;margin:6px 0 0">Одна и та же машина выложена на нескольких площадках, программа узнала её по пробегу, году, цвету, цене и тексту. Зелёным отмечено, где дешевле. Сверху машины с самой большой разницей в цене: продавцу проще уступить до цены, которую он сам указал на другой площадке.</p>`
+  +rows.map(([r,i])=>{const ps=[...r.platforms].sort((x,y)=>(x.price||1e9)-(y.price||1e9)),lo=ps[0].price;
+   return `<div class="mitem"><div class="th" style="${r.photo?`background-image:url('${esc(r.photo)}')`:''}"></div><div style="min-width:0">
+    <a href="#" class="mt" data-open="${i}">${esc(r.title)}</a><div class="ms">${esc(specs(r))} · ${esc(r.status)}</div>
+    <div class="plats">${ps.map(p=>`<a class="plat${p.price&&p.price===lo?' lo':''}" href="${esc(p.url)}" target="_blank">${esc(p.name)} ${money(p.price)}${p.price&&lo&&p.price>lo?` <span class="bad">+$${num(p.price-lo)}</span>`:''}</a>`).join('')}</div></div></div>`}).join('')
+  :'<div class="empty">Пока ни одна машина не найдена сразу на нескольких площадках.</div>';
+ $('multi').querySelectorAll('[data-open]').forEach(a=>a.onclick=e=>{e.preventDefault();openCard(+a.dataset.open)})}
+
+/* ───────── рассрочки ───────── */
+function renderInst(){const groups={};instRows().forEach(x=>{const g=(x[0].model_title||'')+' '+(x[0].year||'');(groups[g]=groups[g]||[]).push(x)});
+ const val=r=>r.inst.rate!=null?r.inst.rate:r.inst.over_pct!=null?1000+r.inst.over_pct:1e9;
+ const keys=Object.keys(groups).sort((a,b)=>groups[b].length-groups[a].length||a.localeCompare(b));
+ $('inst').innerHTML=`<p class="muted" style="font-size:14px;margin:6px 0 0">Предложения с рассрочкой, аренды с выкупом и дилеров, где в тексте есть взнос, платёж и срок. Внутри модели и года сверху самые выгодные: по ставке годовых, считая от рыночной цены машины. Зелёным отмечено лучшее.</p>`
+  +keys.map(g=>{const rows=groups[g].sort(([a],[b])=>val(a)-val(b));
+   return `<h3 class="ihead">${esc(g)} <span class="muted">${rows.length}</span></h3><div class="itbl">`+rows.map(([r,i],j)=>{const c=r.inst;
+    return `<a href="#" class="irow${j===0&&c.rate!=null&&rows.length>1?' best':''}" data-open="${i}"><span class="iname">${esc(r.title)}<small>${esc(r.source||'')}${r.km?', '+km(r.km):''}</small></span>
+     <span>${c.up!=null?'взнос '+money(c.up):'взнос не указан'}<small>${c.months} × ${money(c.monthly)}</small></span>
+     <span>${c.total!=null?'<b>'+money(c.total)+'</b>':'—'}<small>${c.over!=null?(c.over>0?'переплата '+money(c.over)+' ('+c.over_pct+'%)':'без переплаты'):'итог неизвестен'}</small></span>
+     <span class="irate">${c.rate!=null?c.rate+'%':'—'}<small>годовых</small></span></a>`}).join('')+'</div>'}).join('');
+ $('inst').querySelectorAll('[data-open]').forEach(a=>a.onclick=e=>{e.preventDefault();openCard(+a.dataset.open)})}
+
+/* ───────── вкладки ───────── */
+function setView(v){document.querySelectorAll('#views button').forEach(b=>b.setAttribute('aria-selected',b.dataset.v===v));
+ ['pick','market','fav','multi','inst'].forEach(x=>$('v-'+x).hidden=x!==v);$('cmpbar').style.display=(v!=='market'&&cmp.size)?'flex':'none';
+ if(v==='fav')renderFav();if(v==='market')renderMarket();if(v==='multi')renderMulti();if(v==='inst')renderInst()}
+document.querySelectorAll('#views button').forEach(b=>b.onclick=()=>setView(b.dataset.v));
+render();
+</script>
+<div id="boot" style="position:fixed;inset:0;display:grid;place-items:center;padding:24px;text-align:center;background:var(--paper);color:var(--mute);z-index:50">Загружаю каталог…</div>
+<div class="sendbar" id="sendbar"><span id="sendn"></span><button class="btn" id="sendgo">Отправить боту</button></div>
+<script>
+(function(){
+const tg=window.Telegram&&Telegram.WebApp, inTg=!!(tg&&tg.initData), root=document.documentElement;
+const ls={get(k,d){try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+if(tg){tg.ready();tg.expand();
+ const theme=()=>{if(tg.colorScheme)root.dataset.theme=tg.colorScheme;
+  try{const bg=getComputedStyle(root).getPropertyValue('--paper').trim();tg.setHeaderColor(bg);tg.setBackgroundColor(bg)}catch(e){}};
+ theme();tg.onEvent&&tg.onEvent('themeChanged',theme)}
+const boot=document.getElementById('boot'), fail=t=>{boot.textContent=t};
+// внутри Telegram внешние ссылки открываются через Telegram, иначе их молча глотает встроенный браузер
+const open=h=>{if(!inTg)return window.open(h,'_blank');if(/^https:\/\/t\.me\//.test(h))tg.openTelegramLink(h);else tg.openLink(h)};
+document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[href]');if(!a||!inTg)return;
+ const h=a.href;if(/^https:\/\/t\.me\//.test(h)||(/^https?:/.test(h)&&a.target==='_blank')){e.preventDefault();open(h)}},true);
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+const k=new URLSearchParams(location.search).get('k');
+if(!k){fail('Откройте каталог кнопкой «Каталог» в боте.');return}
+if(!window.crypto||!crypto.subtle||!window.DecompressionStream){fail('Этот браузер слишком старый для каталога. Обновите Telegram или откройте ссылку в Chrome/Safari.');return}
+const raw=Uint8Array.from(atob(k.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0));
+
+/* облако Telegram (CloudStorage): заметки и неотправленные отметки видны на всех устройствах; вне Telegram — память браузера */
+const CS=tg&&tg.CloudStorage&&tg.isVersionAtLeast&&tg.isVersionAtLeast('6.9')?tg.CloudStorage:null;
+const cs=(fn,...a)=>new Promise(res=>{if(!CS)return res(null);const t=setTimeout(()=>res(null),2000);
+ try{CS[fn](...a,(err,v)=>{clearTimeout(t);res(err?null:v)})}catch(e){clearTimeout(t);res(null)}});
+async function loadNotes(){const local=ls.get('carmon_notes',{});if(!CS)return local;
+ const keys=((await cs('getKeys'))||[]).filter(k=>k.startsWith('n_'));if(!keys.length)return local;
+ const vals=(await cs('getItems',keys))||{};const out={...local};
+ for(const [k,v] of Object.entries(vals))if(v)out[parseInt(k.slice(2),36)]=v;return out}
+async function loadInsp(){const local=ls.get('carmon_insp_rid',{});if(!CS)return local;
+ const keys=((await cs('getKeys'))||[]).filter(k=>k.startsWith('i_'));if(!keys.length)return local;
+ const vals=(await cs('getItems',keys))||{};const out={...local};
+ for(const [k,v] of Object.entries(vals))if(v)try{out[parseInt(k.slice(2),36)]=JSON.parse(v)}catch(e){}return out}
+function saveInsp(rid,d){const a=ls.get('carmon_insp_rid',{});if(d)a[rid]=d;else delete a[rid];ls.set('carmon_insp_rid',a);
+ const k='i_'+(+rid).toString(36);if(d)cs('setItem',k,JSON.stringify(d).slice(0,4000));else cs('removeItem',k)}
+const store={async get(k){const v=await cs('getItem','s_'+k);if(v)try{return JSON.parse(v)}catch(e){}return ls.get('carmon_s_'+k,null)},
+ set(k,v){ls.set('carmon_s_'+k,v);cs('setItem','s_'+k,JSON.stringify(v).slice(0,4000))}};
+function saveNote(rid,text){const n=ls.get('carmon_notes',{});if(text)n[rid]=text;else delete n[rid];ls.set('carmon_notes',n);
+ const k='n_'+(+rid).toString(36);if(text)cs('setItem',k,text.slice(0,4000));else cs('removeItem',k)}
+
+/* отметки: видны сразу, боту уходят ссылкой t.me/бот?start=mk_…, программа применит их при следующем запуске */
+const CODE={fav:'f',called:'c',seen:'s',no:'n',hide:'h'}, PK='carmon_pending', DAY=864e5;
+let pend=ls.get(PK,{});
+const savePend=()=>{ls.set(PK,pend);const v=JSON.stringify(pend);if(v.length<4000)cs('setItem','pend',v)};
+async function loadPend(){const c=await cs('getItem','pend');if(!c)return;try{   // свежее по времени — главнее
+ for(const [rid,e] of Object.entries(JSON.parse(c)))if(!pend[rid]||pend[rid].ts<e.ts)pend[rid]=e}catch(e){}}
+function mergePending(rows){const by={};rows.forEach(r=>{if(r.rid)by[r.rid]=r});const now=Date.now();
+ for(const [rid,e] of Object.entries(pend)){const r=by[rid];
+  if(!r||(e.sent&&now-e.ts>3*DAY)){if(r||now-e.ts>14*DAY)delete pend[rid];continue}   // бот так и не применил — не врём
+  r.marks=r.marks||[];
+  for(const [m,on] of Object.entries(e.marks)){if(r.marks.includes(m)===on){if(e.sent)delete e.marks[m]}else r.marks=on?[...r.marks,m]:r.marks.filter(x=>x!==m)}
+  if(!Object.keys(e.marks).length)delete pend[rid]}
+ savePend()}
+function bar(){const n=Object.values(pend).filter(e=>!e.sent).length,b=document.getElementById('sendbar');
+ b.style.display=n&&window.CAT&&CAT.bot?'flex':'none';document.getElementById('sendn').textContent='Новых отметок: '+n}
+function send(){const items=Object.entries(pend).filter(([,e])=>!e.sent);let payload='mk';const done=[];
+ for(const [rid,e] of items){const t=Object.entries(e.marks).map(([m,on])=>'_'+(+rid).toString(36)+(on?CODE[m]:CODE[m].toUpperCase())).join('');
+  if((payload+t).length>64)break;payload+=t;done.push(rid)}
+ if(!done.length)return;done.forEach(rid=>{pend[rid].sent=true});savePend();
+ open('https://t.me/'+CAT.bot+'?start='+payload);bar();
+ if(items.length>done.length)setTimeout(()=>{document.getElementById('sendn').textContent='Осталось отправить: '+(items.length-done.length)},300)}
+document.getElementById('sendgo').onclick=send;
+
+(async()=>{
+ const key=await crypto.subtle.importKey('raw',raw,'AES-GCM',false,['decrypt']);
+ let res;try{res=await fetch('data.bin?t='+Date.now(),{cache:'no-store'})}
+ catch(e){throw new Error('нет связи, а сохранённой копии каталога на этом устройстве ещё нет')}
+ if(!res.ok)throw new Error('каталог ещё не выложен ('+res.status+')');
+ const offline=res.headers.get('x-carmon-offline');
+ const buf=new Uint8Array(await res.arrayBuffer());
+ let plain;try{plain=await crypto.subtle.decrypt({name:'AES-GCM',iv:buf.slice(0,12)},key,buf.slice(12))}
+ catch(e){throw new Error('ключ не подходит — откройте каталог заново кнопкой в боте')}
+ const txt=await new Response(new Blob([plain]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
+ const d=JSON.parse(txt);
+ const [notes,insp]=await Promise.all([loadNotes(),loadInsp(),loadPend()]);
+ d.rows.forEach(r=>{if(r.rid&&notes[r.rid])r.note=notes[r.rid];if(r.rid&&insp[r.rid])r.insp=insp[r.rid]});
+ mergePending(d.rows);
+ window.DATA=d.rows;window.STATS=d.stats;window.UPDATED=d.updated;
+ window.CAT={bot:d.bot||'',open,store,note(r,text){if(r.rid)saveNote(r.rid,text)},insp(r,v){if(r.rid)saveInsp(r.rid,v)},
+  toggle(r,m,on){const e=pend[r.rid]=pend[r.rid]||{marks:{},ts:0};e.marks[m]=on;e.sent=false;e.ts=Date.now();savePend();bar()}};
+ const s=document.createElement('script');s.textContent=document.getElementById('app').textContent;document.body.appendChild(s);
+ if(tg&&tg.BackButton){const o=window.openM,c=window.closeM;   // системная «Назад» закрывает карточку
+  window.openM=function(){o.apply(this,arguments);tg.BackButton.show()};
+  window.closeM=function(){c.apply(this,arguments);tg.BackButton.hide()};
+  tg.BackButton.onClick(()=>window.closeM())}
+ if(offline)document.getElementById('warn').insertAdjacentHTML('afterbegin',
+  '<div class="warnline">Нет связи — показан каталог, сохранённый на этом устройстве (от '+String(d.updated).replace(/[<>&]/g,'')+').</div>');
+ bar();boot.remove();
+})().catch(e=>fail('Не удалось открыть каталог: '+e.message));
+})();
+</script>
+</body></html>
